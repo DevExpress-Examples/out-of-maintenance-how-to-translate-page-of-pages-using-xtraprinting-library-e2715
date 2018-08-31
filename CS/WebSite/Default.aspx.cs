@@ -13,29 +13,31 @@ using System.IO;
 using System.Drawing;
 using DevExpress.XtraPrintingLinks;
 
-public partial class _Default : System.Web.UI.Page {
-    protected void btn_Click(object sender, EventArgs e) {       
-         GridViewLink link = new GridViewLink(exporter);
+public partial class _Default : System.Web.UI.Page
+{
+    protected void btn_Click(object sender, EventArgs e)
+    {
+        CompositeLinkBase link = new CompositeLinkBase(new PrintingSystemBase());
+        PrintableComponentLinkBase pcLink1 = new PrintableComponentLinkBase();
+        pcLink1.Component = exporter;
+        link.Links.Add(pcLink1);
 
-         link.CreateMarginalHeaderArea += new CreateAreaEventHandler(link_CreateMarginalHeaderArea);
-
-         link.CreatePS();
-
-         link.CreateDocument();
-
-         using (MemoryStream stream = new MemoryStream()) {
-             link.PrintingSystem.ExportToPdf(stream);
-             Response.Clear();
-             Response.Buffer = false;
-             Response.AppendHeader("Content-Type", "application/pdf");
-             Response.AppendHeader("Content-Transfer-Encoding", "binary");
-             Response.AppendHeader("Content-Disposition", "attachment; filename=grid.pdf");
-             Response.BinaryWrite(stream.GetBuffer());
-             Response.End();
-         }
+        link.CreateMarginalHeaderArea += new CreateAreaEventHandler(link_CreateMarginalHeaderArea);
+        using (MemoryStream stream = new MemoryStream())
+        {
+            link.ExportToPdf(stream);
+            Response.Clear();
+            Response.Buffer = false;
+            Response.AppendHeader("Content-Type", "application/pdf");
+            Response.AppendHeader("Content-Transfer-Encoding", "binary");
+            Response.AppendHeader("Content-Disposition", "attachment; filename=grid.pdf");
+            Response.BinaryWrite(stream.GetBuffer());
+            Response.End();
+        }
     }
 
-    void link_CreateMarginalHeaderArea(object sender, CreateAreaEventArgs e) {
+    void link_CreateMarginalHeaderArea(object sender, CreateAreaEventArgs e)
+    {
         string format = "Page(eng) {0} of(eng) {1}";
         e.Graph.Font = e.Graph.DefaultFont;
         e.Graph.BackColor = Color.Transparent;
@@ -46,5 +48,5 @@ public partial class _Default : System.Web.UI.Page {
             Color.Black, r, BorderSide.None);
         brick.Alignment = BrickAlignment.Far;
         brick.AutoWidth = true;
-    }  
+    }
 }
